@@ -1,5 +1,7 @@
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { FiEdit2, FiTrash2, FiClock, FiRepeat, FiCalendar, FiTerminal } from 'react-icons/fi';
 import type { Schedule, ScheduleType } from '../types';
 import { Button, Toggle, Badge, EmptyState, LoadingSpinner } from './common';
 
@@ -10,37 +12,97 @@ const Table = styled.table`
 
 const Th = styled.th`
   text-align: left;
-  padding: 12px 16px;
-  background-color: #f8fafc;
+  padding: 14px 20px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 2px solid #e2e8f0;
 `;
 
 const Td = styled.td`
-  padding: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f1f5f9;
   font-size: 14px;
   color: #334155;
 `;
 
-const Tr = styled.tr`
+const Tr = styled(motion.tr)`
+  transition: background-color 0.2s ease;
+
   &:hover {
     background-color: #f8fafc;
   }
+
+  &:last-child td {
+    border-bottom: none;
+  }
 `;
 
-const ScheduleName = styled.strong`
-  color: #1e293b;
+const ScheduleName = styled.div`
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 15px;
+`;
+
+const ScheduleDetails = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 2px;
+`;
+
+const TaskBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
 `;
 
 const Actions = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
+`;
+
+const IconButton = styled(motion.button)<{ $variant?: 'ghost' | 'danger' }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ${({ $variant }) =>
+    $variant === 'danger'
+      ? `
+        background: #fef2f2;
+        color: #ef4444;
+        &:hover {
+          background: #fee2e2;
+          color: #dc2626;
+        }
+      `
+      : `
+        background: #f1f5f9;
+        color: #64748b;
+        &:hover {
+          background: #e2e8f0;
+          color: #334155;
+        }
+      `}
 `;
 
 interface ScheduleTableProps {
@@ -51,11 +113,15 @@ interface ScheduleTableProps {
   loading?: boolean;
 }
 
-const SCHEDULE_TYPE_BADGES: Record<ScheduleType, { variant: 'info' | 'warning' | 'success' | 'secondary'; label: string }> = {
-  ONE_TIME: { variant: 'info', label: 'One Time' },
-  RECURRING: { variant: 'warning', label: 'Recurring' },
-  WEEKLY: { variant: 'success', label: 'Weekly' },
-  CRON: { variant: 'secondary', label: 'Cron' },
+const SCHEDULE_TYPE_CONFIG: Record<ScheduleType, {
+  variant: 'info' | 'warning' | 'success' | 'secondary';
+  label: string;
+  icon: React.ReactNode;
+}> = {
+  ONE_TIME: { variant: 'info', label: 'One Time', icon: <FiClock size={12} /> },
+  RECURRING: { variant: 'warning', label: 'Recurring', icon: <FiRepeat size={12} /> },
+  WEEKLY: { variant: 'success', label: 'Weekly', icon: <FiCalendar size={12} /> },
+  CRON: { variant: 'secondary', label: 'Cron', icon: <FiTerminal size={12} /> },
 };
 
 function formatScheduleDetails(schedule: Schedule): string {
@@ -91,7 +157,12 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({
       <EmptyState
         icon="📅"
         title="No schedules yet"
-        description="Create your first schedule to get started."
+        description="Create your first schedule to start automating tasks"
+        action={
+          <Button onClick={() => {}}>
+            Create Schedule
+          </Button>
+        }
       />
     );
   }
@@ -100,27 +171,41 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({
     <Table>
       <thead>
         <tr>
-          <Th>Name</Th>
+          <Th>Schedule</Th>
           <Th>Task</Th>
           <Th>Type</Th>
-          <Th>Schedule</Th>
+          <Th>Timing</Th>
           <Th>Status</Th>
-          <Th>Actions</Th>
+          <Th style={{ width: 120 }}>Actions</Th>
         </tr>
       </thead>
       <tbody>
-        {schedules.map((schedule) => {
-          const badgeConfig = SCHEDULE_TYPE_BADGES[schedule.scheduleType];
+        {schedules.map((schedule, index) => {
+          const typeConfig = SCHEDULE_TYPE_CONFIG[schedule.scheduleType];
           return (
-            <Tr key={schedule.id}>
+            <Tr
+              key={schedule.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
+            >
               <Td>
                 <ScheduleName>{schedule.name}</ScheduleName>
               </Td>
-              <Td>{schedule.taskName}</Td>
               <Td>
-                <Badge variant={badgeConfig.variant}>{badgeConfig.label}</Badge>
+                <TaskBadge>{schedule.taskName}</TaskBadge>
               </Td>
-              <Td>{formatScheduleDetails(schedule)}</Td>
+              <Td>
+                <Badge variant={typeConfig.variant}>
+                  {typeConfig.icon}
+                  {typeConfig.label}
+                </Badge>
+              </Td>
+              <Td>
+                <ScheduleDetails>
+                  {formatScheduleDetails(schedule)}
+                </ScheduleDetails>
+              </Td>
               <Td>
                 <Toggle
                   checked={schedule.enabled}
@@ -129,20 +214,21 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({
               </Td>
               <Td>
                 <Actions>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <IconButton
                     onClick={() => onEdit(schedule)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
+                    <FiEdit2 size={16} />
+                  </IconButton>
+                  <IconButton
+                    $variant="danger"
                     onClick={() => onDelete(schedule.id)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Delete
-                  </Button>
+                    <FiTrash2 size={16} />
+                  </IconButton>
                 </Actions>
               </Td>
             </Tr>

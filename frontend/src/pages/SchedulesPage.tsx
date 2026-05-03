@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import { FiPlus, FiLogOut, FiCalendar } from 'react-icons/fi';
 import type { Schedule, CreateScheduleRequest } from '../types';
 import { clearAuthCredentials } from '../api/client';
 import { useSchedules, useTasks, useAlert } from '../hooks';
@@ -16,31 +18,68 @@ import { ScheduleForm } from '../components/ScheduleForm';
 
 const Container = styled.div`
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
 `;
 
 const Header = styled.header`
-  background-color: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 16px 24px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 0 24px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 `;
 
-const Logo = styled.div`
+const Logo = styled(motion.div)`
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 20px;
+  gap: 14px;
+  font-size: 22px;
   font-weight: 700;
-  color: #1e293b;
+  color: white;
+  letter-spacing: -0.02em;
 `;
 
-const Main = styled.main`
-  max-width: 1200px;
+const LogoIcon = styled.div`
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+`;
+
+const Main = styled(motion.main)`
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 40px 24px;
+`;
+
+const PageHeader = styled.div`
+  margin-bottom: 32px;
+`;
+
+const PageTitle = styled.h1`
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+`;
+
+const PageDescription = styled.p`
+  font-size: 16px;
+  color: #64748b;
+`;
+
+const StyledCard = styled(Card)`
+  animation: none;
 `;
 
 interface SchedulesPageProps {
@@ -146,22 +185,43 @@ export const SchedulesPage: React.FC<SchedulesPageProps> = ({ onLogout }) => {
   return (
     <Container>
       <Header>
-        <Logo>
-          <span>📅</span>
+        <Logo
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <LogoIcon>
+            <FiCalendar size={22} color="white" />
+          </LogoIcon>
           <span>Task Scheduler</span>
         </Logo>
-        <Button variant="ghost" onClick={handleLogout}>
+        <Button variant="ghost" onClick={handleLogout} style={{ color: 'white' }}>
+          <FiLogOut size={18} />
           Logout
         </Button>
       </Header>
 
-      <Main>
+      <Main
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         {alert && <Alert type={alert.type} message={alert.message} />}
 
-        <Card>
+        <PageHeader>
+          <PageTitle>Schedules</PageTitle>
+          <PageDescription>
+            Manage your scheduled tasks and automate recurring jobs
+          </PageDescription>
+        </PageHeader>
+
+        <StyledCard>
           <CardHeader>
-            <CardTitle>Schedules</CardTitle>
-            <Button onClick={handleCreate}>+ New Schedule</Button>
+            <CardTitle>All Schedules</CardTitle>
+            <Button onClick={handleCreate}>
+              <FiPlus size={18} />
+              New Schedule
+            </Button>
           </CardHeader>
           <ScheduleTable
             schedules={schedules}
@@ -170,7 +230,7 @@ export const SchedulesPage: React.FC<SchedulesPageProps> = ({ onLogout }) => {
             onToggle={handleToggle}
             loading={loading}
           />
-        </Card>
+        </StyledCard>
       </Main>
 
       <ScheduleForm

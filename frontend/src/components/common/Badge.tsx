@@ -7,24 +7,42 @@ interface BadgeContainerProps {
 }
 
 const BadgeContainer = styled.span<BadgeContainerProps>`
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 
   ${({ $variant }) => {
     switch ($variant) {
       case 'success':
-        return 'background-color: #dcfce7; color: #166534;';
+        return `
+          background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+          color: #065f46;
+        `;
       case 'warning':
-        return 'background-color: #fef3c7; color: #92400e;';
+        return `
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          color: #92400e;
+        `;
       case 'info':
-        return 'background-color: #dbeafe; color: #1e40af;';
+        return `
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+          color: #1e40af;
+        `;
       case 'danger':
-        return 'background-color: #fee2e2; color: #991b1b;';
+        return `
+          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+          color: #991b1b;
+        `;
       default:
-        return 'background-color: #f1f5f9; color: #475569;';
+        return `
+          background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+          color: #475569;
+        `;
     }
   }}
 `;

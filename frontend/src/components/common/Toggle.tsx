@@ -4,8 +4,8 @@ import styled from 'styled-components';
 const ToggleWrapper = styled.label`
   position: relative;
   display: inline-block;
-  width: 44px;
-  height: 24px;
+  width: 48px;
+  height: 26px;
 `;
 
 const ToggleInput = styled.input`
@@ -14,11 +14,21 @@ const ToggleInput = styled.input`
   height: 0;
 
   &:checked + span {
-    background-color: #22c55e;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
   }
 
   &:checked + span:before {
-    transform: translateX(20px);
+    transform: translateX(22px);
+  }
+
+  &:focus + span {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+
+  &:disabled + span {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -29,20 +39,25 @@ const Slider = styled.span`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #cbd5e1;
-  transition: 0.3s;
-  border-radius: 24px;
+  background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 26px;
 
   &:before {
     position: absolute;
     content: '';
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
     left: 3px;
     bottom: 3px;
     background-color: white;
-    transition: 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  &:hover:before {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 `;
 

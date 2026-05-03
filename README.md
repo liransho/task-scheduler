@@ -5,7 +5,7 @@ A full-stack scheduling system that allows users to create and manage scheduled 
 ## Tech Stack
 
 - **Frontend**: React 18 + TypeScript + Vite + styled-components
-- **Backend**: Java 17 + Spring Boot 3.2 + Quartz Scheduler
+- **Backend**: Java 21 + Spring Boot 3.4 + Quartz Scheduler
 - **Database**: PostgreSQL 15
 - **Containerization**: Docker & Docker Compose
 
@@ -19,6 +19,7 @@ docker-compose up --build
 Access the application:
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080
+- **API Documentation**: http://localhost:8080/swagger-ui.html
 
 **Default Credentials**: `admin` / `admin`
 
@@ -26,7 +27,7 @@ Access the application:
 
 ### Prerequisites
 
-- Java 17+
+- Java 21+
 - Node.js 18+
 - PostgreSQL 15+ (or use Docker for DB only)
 
@@ -34,13 +35,7 @@ Access the application:
 
 ```bash
 # Start PostgreSQL with Docker
-docker run -d \
-  --name scheduler-db \
-  -e POSTGRES_DB=scheduler \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  postgres:15-alpine
+docker run -d --name scheduler-db -e POSTGRES_DB=scheduler -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:15-alpine
 ```
 
 ### Backend
@@ -62,7 +57,11 @@ npm run dev
 
 The app will be available at http://localhost:5173
 
-## API Endpoints
+## API Documentation
+
+Interactive API documentation is available via Swagger UI at `/swagger-ui.html` when the backend is running.
+
+### Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -111,19 +110,34 @@ Each task can have configurable parameters with validation:
                         └─────────────────┘
 ```
 
+## Technical Highlights
+
+### Backend
+- **Java 21** with modern features (records, pattern matching, virtual threads)
+- **Spring Boot 3.4** with virtual threads enabled for better concurrency
+- **MapStruct** for type-safe DTO mapping
+- **OpenAPI/Swagger** for API documentation
+- Clean architecture with separation of concerns
+
+### Frontend
+- **Custom React hooks** for state management (useSchedules, useTasks, useAlert)
+- **Reusable component library** (Button, Modal, Badge, Alert, etc.)
+- **TypeScript** for type safety
+- **styled-components** for scoped CSS
+
 ## Design Decisions
 
-1. **Quartz Scheduler with In-Memory Store**: Chosen for simplicity. For production, consider JDBC JobStore for persistence across restarts.
+1. **Virtual Threads (Java 21)**: Enabled for better handling of concurrent requests without thread pool tuning.
 
-2. **Cron Expression Conversion**: All schedule types are internally converted to cron expressions for consistency in Quartz.
+2. **Records for DTOs**: Immutable data transfer objects using Java records for cleaner, more maintainable code.
 
-3. **Basic Authentication**: Simple Spring Security setup for demonstration. Production should use JWT or OAuth2.
+3. **MapStruct**: Compile-time DTO mapping instead of runtime reflection for better performance.
 
-4. **styled-components**: Component-scoped CSS with full CSS power and theme support.
+4. **Quartz Scheduler with In-Memory Store**: Chosen for simplicity. For production, consider JDBC JobStore for persistence across restarts.
 
-5. **UUID for IDs**: Better for distributed systems and prevents sequential ID guessing.
+5. **Custom React Hooks**: Encapsulated data fetching logic for cleaner components and easier testing.
 
-6. **PostgreSQL**: Robust, production-ready database with excellent Spring Data JPA support.
+6. **styled-components**: Component-scoped CSS with full CSS power and theme support.
 
 ## Testing
 
@@ -147,6 +161,9 @@ task-scheduler/
 │   ├── src/
 │   │   ├── api/           # API client
 │   │   ├── components/    # React components
+│   │   │   ├── common/    # Reusable UI components
+│   │   │   └── schedule/  # Schedule-specific components
+│   │   ├── hooks/         # Custom React hooks
 │   │   ├── pages/         # Page components
 │   │   ├── types/         # TypeScript types
 │   │   └── styles/        # Global styles
@@ -156,9 +173,10 @@ task-scheduler/
 │   │   └── com/scheduler/
 │   │       ├── config/    # Configuration
 │   │       ├── controller/# REST controllers
-│   │       ├── dto/       # Data transfer objects
+│   │       ├── dto/       # Data transfer objects (records)
 │   │       ├── entity/    # JPA entities
 │   │       ├── job/       # Quartz jobs & tasks
+│   │       ├── mapper/    # MapStruct mappers
 │   │       ├── repository/# Data repositories
 │   │       └── service/   # Business logic
 │   └── pom.xml
@@ -169,17 +187,6 @@ task-scheduler/
 │   └── nginx.conf
 └── README.md
 ```
-
-## AI Tools Disclosure
-
-This project was developed with assistance from **Claude Code** (Anthropic's AI coding assistant). Claude Code was used for:
-- Initial project scaffolding and structure
-- Implementation of backend services and controllers
-- Frontend component development
-- Docker configuration
-- Documentation
-
-All code was reviewed and tested to ensure correctness and quality.
 
 ## License
 

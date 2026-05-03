@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw compile *)",
+      "Bash(npm run *)",
+      "Bash(mvn wrapper:wrapper -Dmaven=3.9.6)"
+    ]
+  }
+}
